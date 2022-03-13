@@ -1,0 +1,32 @@
+{
+  "pluginName": "asarer",
+  "author": "ChandlerVer5",
+  "homepage": "https://www.kancloud.cn/@chandler",
+  "description": "查看asar代码分析🔍 utools插件等😄",
+  "version": "0.0.1",
+  "logo": "logo.png",
+  "main": "index.html",
+  "preload": "preload.js",
+  "pluginSetting": {
+    "single": true
+  },
+  "development": {
+    "main": "http://localhost:8080"
+  },
+  "features": [
+    {
+      "code": "asarer",
+      "explain": "asar助手、分析器",
+      "cmds": [
+        "asar",
+        {
+          "type": "files",
+          "label": "asar analyse",
+          "fileType": "file",
+          "match": "/.asar$/",
+          "maxLength": 1
+        }
+      ]
+    }
+  ]
+}
