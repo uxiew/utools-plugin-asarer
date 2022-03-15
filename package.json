@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build && npm run build:preload",
-    "build:preload": "webpack --config webpack.prod.js",
+    "build:preload": "cpy --flat 'README.md' 'utools/plugin.json' 'utools/logo.png' dist && webpack --config webpack.prod.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -18,8 +18,8 @@
     "vconsole": "^3.12.1",
     "vue": "^3.0.0",
     "vue-cli-plugin-electron-webpack": "^1.1.11",
-    "vue-monaco-cdn": "^2.0.1",
     "vue-router": "^4.0.0-0",
+    "vue3-ace-editor": "^2.2.2",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
@@ -35,6 +35,8 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-airbnb": "^5.0.2",
     "@vue/eslint-config-typescript": "^7.0.0",
+    "ace-builds": "^1.4.14",
+    "cpy-cli": "^4.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.0.0",

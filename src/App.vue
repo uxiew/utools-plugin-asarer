@@ -8,7 +8,7 @@ import { setAsarPath } from '@/store/store';
 export default defineComponent({
   name: 'Home',
   created() {
-    this.$router.push({ name: 'Home' }).catch((err) => console.log(err));
+    this.$router.push({ name: 'Home' });
     utools.onPluginEnter(({ code, type, payload }) => {
       // 一次查看 一个 asar 包
       const filePath = payload[0].path;

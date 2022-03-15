@@ -30,15 +30,16 @@
             @itemdoubleclick="onListItemDoubleClicked"
           /> -->
         <img v-show="showPic" :src="picSrc" alt="EFE" />
-        <monaco-editor
-          ref="editor"
-          v-show="!showPic"
-          v-model="monacoOptions.value"
+
+        <!-- ace editor -->
+        <VAceEditor
           class="editor"
-          :options="monacoOptions"
-          :language="monacoOptions.language"
-          @editor-did-mount="onEditorDidMount"
-          url="https://cdn.staticfile.org/monaco-editor/0.33.0/min"
+          v-show="!showPic"
+          theme="chrome"
+          :lang="editorOptions.lang"
+          :options="aceEditorOptions"
+          @init="aceEditorInit"
+          v-model:value="editorOptions.value"
         />
       </div>
       <div class="resize" :style="{ left: `${treeWidth - 4}px` }" @mousedown="onMouseDown"></div>
@@ -69,17 +70,39 @@ import { openFile, formatSize } from '../utils';
 import { setAsarPath, getters, setTree } from '../store/store';
 import FileBrowser from '../components/FileBrowser/index.vue';
 import ModalExtract from '../components/ModalExtract.vue';
-import MonacoEditor from 'vue-monaco-cdn';
+
+import ace, { Ace } from 'ace-builds';
+import { VAceEditor } from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/theme-chrome';
+
+import 'ace-builds/src-noconflict/ext-linking';
+import 'ace-builds/src-noconflict/ext-hardwrap';
+import 'ace-builds/src-noconflict/ext-searchbox';
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/mode-json5';
+import 'ace-builds/src-noconflict/mode-typescript';
+import 'ace-builds/src-noconflict/mode-markdown';
+import 'ace-builds/src-noconflict/mode-typescript';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// // https://stackoverflow.com/questions/31767051/how-do-i-use-beautify-in-ace-editor
+// const { beautify } = require('ace-builds/src-noconflict/ext-beautify');
+
+ace.config.setModuleUrl(
+  'basePath',
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  'https://cdn.jsdelivr.net/npm/ace-builds@' + require('ace-builds').version + '/src-noconflict/'
+);
+
+let aceEditor: Ace.Editor;
 
 const Asar = window.Asar;
 const { basename, join, extname } = window.Path;
-let monacoEditor: any = null;
 
 export default defineComponent({
   components: {
     FileBrowser,
     ModalExtract,
-    MonacoEditor,
+    VAceEditor,
   },
   data() {
     const data: {
@@ -98,7 +121,8 @@ export default defineComponent({
         cmax: number;
         cpos: number;
       };
-      monacoOptions: any;
+      editorOptions: any;
+      aceEditorOptions: Partial<Ace.EditorOptions>;
     } = {
       picSrc: '',
       treeWidth: 200,
@@ -115,27 +139,15 @@ export default defineComponent({
         cmax: 100,
         cpos: 25,
       },
-      monacoOptions: {
+      aceEditorOptions: {
+        useWorker: true,
+        fontSize: 12,
+        tabSize: 2,
+        wrap: true,
+      },
+      editorOptions: {
         value: '',
-        language: 'javascript',
-        fontSize: 13,
-        hideCursorInOverviewRuler: true,
-        automaticLayout: true,
-        overviewRulerBorder: false,
-        renderLineHighlight: 'none',
-        fontFamily:
-          'Operator Mono Lig, Dank Mono, Microsoft YaHei Mono, Source_Code_Pro-YaHei Hybrid',
-        lineHeight: 20,
-        fontLigatures: true,
-        detectIndentation: true,
-        wordWrap: 'on',
-        minimap: {
-          enabled: false,
-        },
-        // contextmenu: false,
-        autoIndent: true,
-        // formatOnPaste: true,
-        // formatOnType: true,
+        lang: 'typescript',
       },
     };
     return data;
@@ -173,11 +185,19 @@ export default defineComponent({
           setTimeout(resolve, 300);
         })
     );
+
+    const { name, type } = this.tree[this.tree.length - 1];
+    setTimeout(() => {
+      type === 'file' && this.$nextTick(() => this.onItemClicked('/' + name));
+    }, 800);
   },
   unmounted() {
     this.closeAsar();
   },
   methods: {
+    aceEditorInit(editor: Ace.Editor) {
+      aceEditor = editor;
+    },
     async open(asarpath: string) {
       let path = asarpath;
       if (typeof path !== 'string') {
@@ -203,13 +223,13 @@ export default defineComponent({
       this.selectedItems = [];
     },
     getFileType(file: string) {
-      let language = 'javascript';
+      let language = '';
       switch (extname(file)) {
         case '.html':
           language = 'html';
           break;
         case '.js':
-          language = 'javascript';
+          language = 'typescript';
           break;
         case '.css':
           language = 'css';
@@ -221,20 +241,13 @@ export default defineComponent({
           language = 'markdown';
           break;
         default:
-          language = 'plaintext';
+          language = 'typescript';
           break;
       }
       return language;
     },
-    onEditorDidMount(editor: any) {
-      monacoEditor = editor;
-      const { name, type } = this.tree[this.tree.length - 1];
-      setTimeout(() => {
-        type === 'file' && this.$nextTick(() => this.onItemClicked('/' + name));
-      }, 800);
-    },
     async onItemClicked(filePath: string) {
-      // console.log('===monacoEditor===', this.tree, this.asar);
+      // console.log('===aceEditor===', this.tree, this.asar);
       if (!this.asar) return;
       this.activePath = filePath;
       if (/png|jp(e?)g|gif|svg/.test(extname(filePath))) {
@@ -243,21 +256,17 @@ export default defineComponent({
         return;
       }
       this.showPic = false;
-      if (!monacoEditor) return;
       const code = window.readFileSync(this.asar.getTempPath(filePath), 'UTF-8');
       const language = this.getFileType(filePath);
-      this.monacoOptions.language = language;
-      monacoEditor.setValue(code);
-      setTimeout(() => {
-        language === 'json' && monacoEditor.getAction('editor.action.formatDocument').run();
-      }, 200);
+      this.editorOptions.lang = language;
+      this.editorOptions.value = code;
     },
     async save() {
       const dest = this.activePath;
       // TODO 删除 所有 utools.getPath('temp') + this.title 下所有 .asarer-temp 缓存文件
       const newTempPath = join(utools.getPath('temp'), `${dest}.asarer-temp`);
       //  this.reveal(this.asar._tmp);
-      window.writeFileSync(newTempPath, monacoEditor.getValue(), 'UTF-8');
+      window.writeFileSync(newTempPath, this.editorOptions.value, 'UTF-8');
       await this.asar.write(dest, newTempPath);
       window.rmSync(newTempPath);
     },

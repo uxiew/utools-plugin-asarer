@@ -7,7 +7,7 @@ const { extname, basename, dirname, join, sep } = require('path');
 const fse = require('fs-extra');
 const { remote } = require('electron');
 const { execSync } = require('child_process');
-const pkg = require('../public/plugin.json');
+const pkg = require('./plugin.json');
 const Asar = require('./libs/asar/asar');
 const { writeFileSync, readdirSync, readFileSync, rmdirSync, rmSync } = require('fs-extra');
 
