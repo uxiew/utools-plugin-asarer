@@ -1,6 +1,7 @@
 <template>
   <router-view />
 </template>
+
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { setAsarPath } from '@/store/store';
@@ -9,10 +10,12 @@ export default defineComponent({
   name: 'Home',
   created() {
     this.$router.push({ name: 'Home' });
-    utools.onPluginEnter(({ code, type, payload }) => {
+    utools.onPluginEnter(async ({ code, type, payload }) => {
       // 一次查看 一个 asar 包
-      const filePath = payload[0].path;
+      let filePath: string = payload[0].path;
       if (type === 'files' && payload[0].isFile) {
+        if (window.Path.extname(filePath) === '.upx')
+          filePath = await window.getUpxAsarPath(filePath);
         setAsarPath(filePath);
         this.$router.push({ name: 'Detail' }).catch((err) => console.log(err));
       }
@@ -20,6 +23,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

@@ -2,6 +2,15 @@
 
 主要是方便查看 utools upx 插件源码
 
+# 启动错误
+`error:0308010C:digital envelope routines::unsupported`
+
+解决办法：
+```
+$ set NODE_OPTIONS=--openssl-legacy-provider
+$ npm run dev   # nr dev 无效
+```
+
 # TODO
 1. 文件添加
 2. 文件删除

@@ -1,4 +1,5 @@
 {
+  "name": "asarer",
   "pluginName": "asarer",
   "author": "ChandlerVer5",
   "homepage": "https://www.kancloud.cn/@chandler",
@@ -23,7 +24,7 @@
           "type": "files",
           "label": "asar analyse",
           "fileType": "file",
-          "match": "/.asar$/",
+          "match": "/.(asar|upx)$/",
           "maxLength": 1
         }
       ]

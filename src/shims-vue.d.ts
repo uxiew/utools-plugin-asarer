@@ -21,5 +21,6 @@ interface Window {
   cpSync: any;
   ipcRenderer: any;
   renderRemote: any;
-  showAboutDialog: any;
+  getUpxAsarPath: (path: string) => Promise<string>;
+  showAboutDialog: () => void;
 }

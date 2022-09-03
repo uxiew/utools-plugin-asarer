@@ -304,6 +304,12 @@ export default defineComponent({
     },
     closeAsar() {
       if (this.asar) {
+        if (this.asarPath.indexOf(window.utools.getPath('temp')) === 0) {
+          window.rmSync(this.asarPath, {
+            force: true,
+            recursive: true,
+          });
+        }
         this.asar.close();
         this.asar = null;
       }
