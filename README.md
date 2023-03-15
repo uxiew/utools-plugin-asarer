@@ -23,6 +23,11 @@ $ npm run dev   # nr dev 无效
 # 问题
 [fails with an error "No such file or directory"](https://github.com/electron/asar/issues/37)
 
+这个问题很简单。基本上很多应用程序都有一个 app.asar 文件，但它们也有一个 app.asar.unpacked 文件夹，用于存放一些不应该存在于 ASAR 中的文件。这意味着除非 app.asar.unpacked 和 app.asar 文件位于同一位置，否则 ASAR 文件将无法正确提取。
+
+Read more here:[Adding Unpacked Files in asar Archive](https://electron.atom.io/docs/tutorial/application-packaging/#adding-unpacked-files-in-asar-archive)
+
 # 参考
-"asar-class-api": "github:toyobayashi/asar-class-api",
+"asar-class-api": "github:toyobayashi/asar-class-api"
+
 https://github.com/toyobayashi/asarx-vue
