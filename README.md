@@ -11,13 +11,13 @@ $ npm run dev   # nr dev 无效
 ```
 
 # TODO
-1. 文件添加
-2. 文件删除
-3. ~~文件点击打包-或者自动备份源文件~~
-4. 文件双击重命名
-5. 右侧文件，显示定位到左侧树状菜单
-6. 修改文件源码
-7. 直接分析utools 的upx插件
+- [ ] 文件添加
+- [ ] 文件删除
+- [ ] 文件点击打包-或者自动备份源文件
+- [ ] 文件双击重命名
+- [ ] 右侧文件，显示定位到左侧树状菜单
+- [ ] 修改文件源码
+- [ ] 直接分析 utools 的 upx 插件
 
 # 问题
 [fails with an error "No such file or directory"](https://github.com/electron/asar/issues/37)
